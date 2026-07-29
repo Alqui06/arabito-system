@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arabito FC - Pagos y Caja</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        arabito: {
+                            red: '#D32F2F',
+                            'red-hover': '#B71C1C',
+                            green: '#2E7D32',
+                            blue: '#0288D1',
+                            gold: '#FBC02D'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome para Íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="h-full bg-slate-950 text-slate-100 flex overflow-hidden selection:bg-arabito-red selection:text-white">
+
+    <!-- ==================== BARRA LATERAL (SIDEBAR) ==================== -->
+    <aside id="sidebar" class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between transition-all duration-300 z-30 shrink-0">
+        <div>
+            <!-- Header del Sidebar -->
+            <div class="p-6 border-b border-slate-800 flex flex-col items-center text-center">
+                <div class="w-20 h-24 bg-slate-950 p-2 rounded-xl border border-slate-800/80 shadow-md flex items-center justify-center shrink-0 mb-3 group transition-all hover:border-arabito-red/50">
+                    <img src="/frontend/assets/logo-arabito.png" alt="Logo Arabito FC" class="max-h-full max-w-full object-contain filter drop-shadow">
+                </div>
+                <div class="w-full">
+                    <h2 class="font-black text-white text-lg tracking-wider leading-none uppercase font-sans">ARABITO FC</h2>
+                    <span id="user-role-badge" class="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-arabito-red/20 text-arabito-red border border-arabito-red/30 uppercase mt-2">
+                        Cargando...
+                    </span>
+                </div>
+            </div>
+
+            <!-- Menú de Navegación -->
+            <nav class="p-4 space-y-1">
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 mb-2">Menú Principal</p>
+
+                <a href="dashboard.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all">
+                    <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="atletas.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all">
+                    <i class="fa-solid fa-users w-5 text-center"></i>
+                    <span>Atletas</span>
+                </a>
+
+                <a href="fichas-medicas.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all">
+                    <i class="fa-solid fa-notes-medical w-5 text-center"></i>
+                    <span>Fichas Médicas</span>
+                </a>
+
+                <a href="pagos.html" id="nav-pagos" class="flex items-center gap-3 px-3 py-3 rounded-xl bg-arabito-red text-white font-semibold text-sm shadow-lg shadow-arabito-red/20 transition-all">
+                    <i class="fa-solid fa-file-invoice-dollar w-5 text-center"></i>
+                    <span>Pagos y Caja</span>
+                </a>
+
+                <!-- Sección exclusiva Admin -->
+                <div id="section-admin-only" class="pt-4 border-t border-slate-800/60 mt-4">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 mb-2">Administración</p>
+                    
+                    <a href="usuarios.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all">
+                        <i class="fa-solid fa-user-shield w-5 text-center"></i>
+                        <span>Gestión de Personal</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Footer del Sidebar -->
+        <div class="p-4 border-t border-slate-800">
+            <div class="flex items-center justify-between">
+                <div class="overflow-hidden pr-2">
+                    <p id="user-email" class="text-xs font-semibold text-slate-200 truncate">usuario@arabitofc.com</p>
+                    <p class="text-[10px] text-slate-500">Sesión Activa</p>
+                </div>
+                <button 
+                    onclick="logout()" 
+                    title="Cerrar Sesión" 
+                    class="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded-lg transition-all focus:outline-none"
+                >
+                    <i class="fa-solid fa-right-from-bracket text-base"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
+        
+        <!-- Header Superior -->
+        <header class="h-16 bg-slate-900/60 border-b border-slate-800 flex items-center justify-between px-6 shrink-0 backdrop-blur-md">
+            <div>
+                <h1 class="text-lg font-bold text-white">Pagos y Caja</h1>
+                <p class="text-xs text-slate-400">Control de ingresos, mensualidades y emisión de comprobantes</p>
+            </div>
+            
+            <button 
+                onclick="abrirModalNuevoPago()" 
+                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/20 transition-all flex items-center gap-2"
+            >
+                <i class="fa-solid fa-plus"></i>
+                <span>Registrar Pago</span>
+            </button>
+        </header>
+
+        <!-- Área Escroleable -->
+        <main class="flex-1 overflow-y-auto p-6 space-y-6">
+
+            <!-- Resumen Rápido -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center gap-4">
+                    <div class="w-12 h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400 text-lg">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Total Recaudado (Mes)</p>
+                        <h3 id="stat-recaudado-mes" class="text-xl font-bold text-white">$0.00</h3>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center gap-4">
+                    <div class="w-12 h-12 bg-arabito-blue/10 border border-arabito-blue/20 rounded-xl flex items-center justify-center text-arabito-blue text-lg">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Pagos Registrados</p>
+                        <h3 id="stat-total-pagos" class="text-xl font-bold text-white">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center gap-4">
+                    <div class="w-12 h-12 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center justify-center text-amber-400 text-lg">
+                        <i class="fa-solid fa-hand-holding-dollar"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Método Más Usado</p>
+                        <h3 id="stat-metodo-popular" class="text-xl font-bold text-white">-</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros y Buscador -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row gap-4 items-center justify-between">
+                <div class="relative w-full sm:w-80">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                    <input 
+                        type="text" 
+                        id="input-search-pagos" 
+                        oninput="filtrarTablaPagos()"
+                        placeholder="Buscar por atleta o referencia..." 
+                        class="w-full pl-10 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-arabito-red transition-all"
+                    >
+                </div>
+
+                <div class="flex gap-3 w-full sm:w-auto">
+                    <select id="filter-metodo" onchange="filtrarTablaPagos()" class="bg-slate-950 border border-slate-800 text-slate-300 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-arabito-red">
+                        <option value="todos">Todos los Métodos</option>
+                        <option value="Pago Móvil">Pago Móvil</option>
+                        <option value="Efectivo USD">Efectivo USD</option>
+                        <option value="Transferencia">Transferencia</option>
+                        <option value="Zelle">Zelle</option>
+                    </select>
+
+                    <select id="filter-concepto" onchange="filtrarTablaPagos()" class="bg-slate-950 border border-slate-800 text-slate-300 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-arabito-red">
+                        <option value="todos">Todos los Conceptos</option>
+                        <option value="Mensualidad">Mensualidad</option>
+                        <option value="Inscripción">Inscripción</option>
+                        <option value="Uniforme">Uniforme</option>
+                        <option value="Torneo">Torneo</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Tabla de Transacciones -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold">
+                                <th class="py-3 px-4">Fecha</th>
+                                <th class="py-3 px-4">Atleta</th>
+                                <th class="py-3 px-4">Concepto</th>
+                                <th class="py-3 px-4">Método</th>
+                                <th class="py-3 px-4">Referencia</th>
+                                <th class="py-3 px-4 text-right">Monto</th>
+                                <th class="py-3 px-4 text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-pagos" class="divide-y divide-slate-800/60 text-xs">
+                            <tr>
+                                <td colspan="7" class="py-6 text-center text-slate-500">Cargando pagos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ==================== MODAL REGISTRAR PAGO ==================== -->
+    <div id="modal-pago" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl p-6 shadow-2xl relative">
+            
+            <div class="flex justify-between items-center pb-4 border-b border-slate-800">
+                <h3 class="text-base font-bold text-white uppercase tracking-wider">Registrar Nuevo Pago</h3>
+                <button onclick="cerrarModalPago()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <form id="form-pago" onsubmit="guardarPago(event)" class="mt-4 space-y-4">
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Seleccionar Atleta</label>
+                    <select id="pago-atleta-id" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-arabito-red">
+                        <option value="">Cargando atletas...</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Concepto</label>
+                        <select id="pago-concepto" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-arabito-red">
+                            <option value="Mensualidad">Mensualidad</option>
+                            <option value="Inscripción">Inscripción</option>
+                            <option value="Uniforme">Uniforme</option>
+                            <option value="Torneo">Torneo / Arbitraje</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Método de Pago</label>
+                        <select id="pago-metodo" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-arabito-red">
+                            <option value="Pago Móvil">Pago Móvil</option>
+                            <option value="Efectivo USD">Efectivo USD</option>
+                            <option value="Transferencia">Transferencia Bancaria</option>
+                            <option value="Zelle">Zelle</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Monto ($ USD)</label>
+                        <input type="number" step="0.01" id="pago-monto" required placeholder="0.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-arabito-red">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nº Referencia (Opcional)</label>
+                        <input type="text" id="pago-referencia" placeholder="Ej: 849201" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-arabito-red">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Observaciones / Mes Correspondiente</label>
+                    <input type="text" id="pago-observacion" placeholder="Ej: Mensualidad de Agosto 2026" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-arabito-red">
+                </div>
+
+                <div class="pt-4 border-t border-slate-800 flex justify-end gap-3">
+                    <button type="button" onclick="cerrarModalPago()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/20 transition-all">Registrar Pago</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script de Integración Backend -->
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+        const token = localStorage.getItem('access_token');
+        const userRole = localStorage.getItem('user_role');
+        const userEmail = localStorage.getItem('user_email');
+
+        let todosPagos = [];
+        let listaAtletas = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // Protección de roles: Solo admin puede ver Pagos
+            if (!token || userRole !== 'admin') {
+                alert("Acceso denegado. Este módulo es exclusivo para administradores.");
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            document.getElementById('user-email').innerText = userEmail || 'Usuario';
+            document.getElementById('user-role-badge').innerText = 'Administrador';
+
+            cargarAtletasParaSelect();
+            cargarPagos();
+        });
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        // Cargar Atletas en el desplegable del Modal
+        async function cargarAtletasParaSelect() {
+            try {
+                const res = await fetch(`${API_URL}/atletas/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) return;
+
+                listaAtletas = await res.json();
+                const select = document.getElementById('pago-atleta-id');
+
+                if (listaAtletas.length === 0) {
+                    select.innerHTML = `<option value="">No hay atletas registrados</option>`;
+                    return;
+                }
+
+                select.innerHTML = `<option value="">Seleccione un atleta...</option>` + 
+                    listaAtletas.map(a => `<option value="${a.id}">${a.nombre} ${a.apellido} (${a.categoria || 'S/C'})</option>`).join('');
+
+            } catch (err) {
+                console.error("Error al cargar atletas para pago", err);
+            }
+        }
+
+        // Cargar Lista de Pagos
+        async function cargarPagos() {
+            try {
+                const res = await fetch(`${API_URL}/pagos/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!res.ok) throw new Error("Error al obtener pagos");
+
+                todosPagos = await res.json();
+                actualizarEstadisticas();
+                filtrarTablaPagos();
+
+            } catch (err) {
+                document.getElementById('tabla-pagos').innerHTML = `
+                    <tr><td colspan="7" class="py-4 text-center text-red-400">Error al conectar con la base de datos de pagos.</td></tr>
+                `;
+            }
+        }
+
+        // Calcular Estadísticas Rápidas
+        function actualizarEstadisticas() {
+            const totalRecaudado = todosPagos.reduce((sum, p) => sum + (parseFloat(p.monto) || 0), 0);
+            document.getElementById('stat-recaudado-mes').innerText = `$${totalRecaudado.toFixed(2)}`;
+            document.getElementById('stat-total-pagos').innerText = todosPagos.length;
+
+            if (todosPagos.length > 0) {
+                const conteoMetodos = {};
+                todosPagos.forEach(p => conteoMetodos[p.metodo] = (conteoMetodos[p.metodo] || 0) + 1);
+                const masUsado = Object.keys(conteoMetodos).reduce((a, b) => conteoMetodos[a] > conteoMetodos[b] ? a : b);
+                document.getElementById('stat-metodo-popular').innerText = masUsado;
+            }
+        }
+
+        // Filtrar y Renderizar Tabla
+        function filtrarTablaPagos() {
+            const search = document.getElementById('input-search-pagos').value.toLowerCase();
+            const metodoFilter = document.getElementById('filter-metodo').value;
+            const conceptoFilter = document.getElementById('filter-concepto').value;
+
+            const filtrados = todosPagos.filter(pago => {
+                const nombreAtleta = pago.atleta_nombre ? pago.atleta_nombre.toLowerCase() : '';
+                const ref = pago.referencia ? pago.referencia.toLowerCase() : '';
+                const coincideBusqueda = nombreAtleta.includes(search) || ref.includes(search);
+
+                const coincideMetodo = metodoFilter === 'todos' || pago.metodo === metodoFilter;
+                const coincideConcepto = conceptoFilter === 'todos' || pago.concepto === conceptoFilter;
+
+                return coincideBusqueda && coincideMetodo && coincideConcepto;
+            });
+
+            const tabla = document.getElementById('tabla-pagos');
+
+            if (filtrados.length === 0) {
+                tabla.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-500">No hay pagos registrados con estos criterios.</td></tr>`;
+                return;
+            }
+
+            tabla.innerHTML = filtrados.map(p => `
+                <tr class="hover:bg-slate-800/40 transition-colors">
+                    <td class="py-3 px-4 text-slate-400">${new Date(p.created_at || Date.now()).toLocaleDateString('es-VE')}</td>
+                    <td class="py-3 px-4 font-bold text-white">${p.atleta_nombre || 'Atleta ID #' + p.atleta_id}</td>
+                    <td class="py-3 px-4 text-slate-300"><span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-[10px] font-semibold">${p.concepto}</span></td>
+                    <td class="py-3 px-4 text-slate-300">${p.metodo}</td>
+                    <td class="py-3 px-4 text-slate-400 font-mono">${p.referencia || 'N/A'}</td>
+                    <td class="py-3 px-4 text-right font-bold text-emerald-400">$${parseFloat(p.monto).toFixed(2)}</td>
+                    <td class="py-3 px-4 text-center">
+                        <button onclick="imprimirRecibo(${p.id})" title="Imprimir Recibo" class="p-1.5 text-slate-400 hover:text-white rounded transition-all">
+                            <i class="fa-solid fa-print"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Modales y Métodos
+        function abrirModalNuevoPago() {
+            document.getElementById('form-pago').reset();
+            document.getElementById('modal-pago').classList.remove('hidden');
+        }
+
+        function cerrarModalPago() {
+            document.getElementById('modal-pago').classList.add('hidden');
+        }
+
+        async function guardarPago(e) {
+            e.preventDefault();
+
+            const payload = {
+                atleta_id: parseInt(document.getElementById('pago-atleta-id').value),
+                concepto: document.getElementById('pago-concepto').value,
+                metodo: document.getElementById('pago-metodo').value,
+                monto: parseFloat(document.getElementById('pago-monto').value),
+                referencia: document.getElementById('pago-referencia').value || null,
+                observaciones: document.getElementById('pago-observacion').value || null
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/pagos/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) throw new Error("Error al procesar pago");
+
+                cerrarModalPago();
+                cargarPagos();
+                alert("Pago registrado con éxito. El estatus del atleta ha sido actualizado.");
+
+            } catch (err) {
+                alert("Ocurrió un error al registrar el pago.");
+            }
+        }
+
+        function imprimirRecibo(pagoId) {
+            alert(`Generando recibo de pago #${pagoId}...`);
+        }
+    </script>
+</body>
+</html>

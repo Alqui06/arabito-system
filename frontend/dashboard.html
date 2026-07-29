@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arabito FC - Panel Principal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        arabito: {
+                            red: '#D32F2F',
+                            'red-hover': '#B71C1C',
+                            green: '#2E7D32',
+                            blue: '#0288D1',
+                            gold: '#FBC02D'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome para Íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="h-full bg-slate-950 text-slate-100 flex overflow-hidden selection:bg-arabito-red selection:text-white">
+
+    <!-- ==================== BARRA LATERAL (SIDEBAR) ==================== -->
+    <aside id="sidebar" class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between transition-all duration-300 z-30 shrink-0">
+        <div>
+            <!-- Header del Sidebar (Logo + Nombre) -->
+            <div class="p-5 border-b border-slate-800 flex items-center gap-3">
+                <div class="w-16 h-20 bg-slate-950 p-1 rounded-lg border border-slate-800 flex items-center justify-center shrink-0">
+                    <img src="/frontend/assets/logo-arabito.png" alt="Logo Arabito FC" class="max-h-full max-w-full object-contain">
+                </div>
+                <div class="overflow-hidden">
+                    <h2 class="font-black text-white text-base tracking-wider leading-tight uppercase">ARABITO FC</h2>
+                    <span id="user-role-badge" class="inline-block text-[10px] font-bold px-2 py-0.5 rounded bg-arabito-red/20 text-arabito-red border border-arabito-red/30 uppercase mt-0.5">
+                        Cargando...
+                    </span>
+                </div>
+            </div>
+
+            <!-- Menú de Navegación -->
+            <nav class="p-4 space-y-1">
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 mb-2">Menú Principal</p>
+
+                <a href="dashboard.html" class="flex items-center gap-3 px-3 py-3 rounded-xl bg-arabito-red text-white font-semibold text-sm shadow-lg shadow-arabito-red/20 transition-all">
+                    <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="atletas.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all">
+                    <i class="fa-solid fa-users w-5 text-center"></i>
+                    <span>Atletas</span>
+                </a>
+
+                <a href="fichas-medicas.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all">
+                    <i class="fa-solid fa-notes-medical w-5 text-center"></i>
+                    <span>Fichas Médicas</span>
+                </a>
+
+                <a href="pagos.html" id="nav-pagos" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all">
+                    <i class="fa-solid fa-file-invoice-dollar w-5 text-center"></i>
+                    <span>Pagos y Caja</span>
+                </a>
+
+                <!-- Sección exclusiva Admin -->
+                <div id="section-admin-only" class="pt-4 border-t border-slate-800/60 mt-4">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 mb-2">Administración</p>
+                    
+                    <a href="usuarios.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all">
+                        <i class="fa-solid fa-user-shield w-5 text-center"></i>
+                        <span>Gestión de Personal</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Footer del Sidebar (Usuario + Logout) -->
+        <div class="p-4 border-t border-slate-800">
+            <div class="flex items-center justify-between">
+                <div class="overflow-hidden pr-2">
+                    <p id="user-email" class="text-xs font-semibold text-slate-200 truncate">usuario@arabitofc.com</p>
+                    <p class="text-[10px] text-slate-500">Sesión Activa</p>
+                </div>
+                <button 
+                    onclick="logout()" 
+                    title="Cerrar Sesión" 
+                    class="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded-lg transition-all focus:outline-none"
+                >
+                    <i class="fa-solid fa-right-from-bracket text-base"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
+        
+        <!-- Header Superior -->
+        <header class="h-16 bg-slate-900/60 border-b border-slate-800 flex items-center justify-between px-6 shrink-0 backdrop-blur-md">
+            <div>
+                <h1 class="text-lg font-bold text-white">Resumen General</h1>
+                <p class="text-xs text-slate-400">Bienvenido al panel de control de Arabito FC</p>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button 
+                    onclick="descargarPDF()" 
+                    id="btn-pdf"
+                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs rounded-xl border border-slate-700 transition-all flex items-center gap-2"
+                >
+                    <i class="fa-solid fa-file-pdf text-red-400"></i>
+                    <span>Descargar Reporte PDF</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Área Escroleable -->
+        <main class="flex-1 overflow-y-auto p-6 space-y-6">
+
+            <!-- Tarjetas de Métricas (KPIs) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <!-- Card 1: Total Atletas -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Atletas</p>
+                            <h3 id="kpi-total-atletas" class="text-3xl font-black text-white mt-1">--</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-arabito-blue/10 text-arabito-blue rounded-xl flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Atletas Solventes -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Solventes</p>
+                            <h3 id="kpi-solventes" class="text-3xl font-black text-emerald-400 mt-1">--</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-emerald-500/10 text-emerald-400 rounded-xl flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Atletas Deudores -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Deudores</p>
+                            <h3 id="kpi-deudores" class="text-3xl font-black text-arabito-red mt-1">--</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-arabito-red/10 text-arabito-red rounded-xl flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Recaudación -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Recaudado</p>
+                            <h3 id="kpi-recaudado" class="text-3xl font-black text-arabito-gold mt-1">$ --</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-yellow-500/10 text-arabito-gold rounded-xl flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Accesos Rápidos y Acciones -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                <h2 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Acciones Rápidas</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    
+                    <a href="atletas.html?action=new" class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-arabito-blue transition-all group flex items-center gap-4">
+                        <div class="w-10 h-10 bg-arabito-blue/20 text-arabito-blue rounded-lg flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-user-plus"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-white">Registrar Atleta</h4>
+                            <p class="text-xs text-slate-400">Inscribir nuevo jugador</p>
+                        </div>
+                    </a>
+
+                    <a href="pagos.html?action=new" id="btn-quick-pago" class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-emerald-500 transition-all group flex items-center gap-4">
+                        <div class="w-10 h-10 bg-emerald-500/20 text-emerald-400 rounded-lg flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-cash-register"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-white">Registrar Pago</h4>
+                            <p class="text-xs text-slate-400">Abonar mensualidad</p>
+                        </div>
+                    </a>
+
+                    <a href="fichas-medicas.html?action=new" class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-arabito-red transition-all group flex items-center gap-4">
+                        <div class="w-10 h-10 bg-arabito-red/20 text-arabito-red rounded-lg flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-heart-pulse"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-white">Ficha Médica</h4>
+                            <p class="text-xs text-slate-400">Cargar datos de salud</p>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+
+            <!-- Tabla de Deudores / Alertas de Pago -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-sm font-bold text-white uppercase tracking-wider">Atletas con Mensualidad Pendiente</h2>
+                        <p class="text-xs text-slate-400">Lista prioritaria para cobranza</p>
+                    </div>
+                    <a href="atletas.html?filter=deudores" class="text-xs font-semibold text-arabito-blue hover:underline">Ver todos</a>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold">
+                                <th class="py-3 px-4">Atleta</th>
+                                <th class="py-3 px-4">Categoría</th>
+                                <th class="py-3 px-4">Representante</th>
+                                <th class="py-3 px-4">Teléfono</th>
+                                <th class="py-3 px-4 text-center">Estatus</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-deudores" class="divide-y divide-slate-800/60 text-xs">
+                            <tr>
+                                <td colspan="5" class="py-6 text-center text-slate-500">Cargando datos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Script de Integración Backend -->
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+        const token = localStorage.getItem('access_token');
+        const userRole = localStorage.getItem('user_role');
+        const userEmail = localStorage.getItem('user_email');
+
+        // Validar Sesión al Cargar
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Mostrar correo y rol en sidebar
+            document.getElementById('user-email').innerText = userEmail || 'Usuario';
+            document.getElementById('user-role-badge').innerText = userRole === 'admin' ? 'Administrador' : 'Entrenador';
+
+            // Ocultar elementos exclusivos de Admin si es entrenador
+            if (userRole !== 'admin') {
+                const adminSection = document.getElementById('section-admin-only');
+                if (adminSection) adminSection.style.display = 'none';
+
+                const btnPdf = document.getElementById('btn-pdf');
+                if (btnPdf) btnPdf.style.display = 'none';
+
+                const navPagos = document.getElementById('nav-pagos');
+                if (navPagos) navPagos.style.display = 'none';
+
+                const btnQuickPago = document.getElementById('btn-quick-pago');
+                if (btnQuickPago) btnQuickPago.style.display = 'none';
+            }
+
+            // Cargar datos del Backend
+            cargarKPIs();
+            cargarDeudores();
+        });
+
+        // Función para cerrar sesión
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        // Cargar Estadísticas en las Tarjetas
+        async function cargarKPIs() {
+            try {
+                const headers = { 'Authorization': `Bearer ${token}` };
+
+                // Fetch Solvencia
+                const resSolvencia = await fetch(`${API_URL}/reportes/solvencia`, { headers });
+                if (resSolvencia.ok) {
+                    const data = await resSolvencia.json();
+                    document.getElementById('kpi-total-atletas').innerText = data.total_atletas;
+                    document.getElementById('kpi-solventes').innerText = data.total_solventes;
+                    document.getElementById('kpi-deudores').innerText = data.total_deudores;
+                }
+
+                // Fetch Finanzas (Solo si es Admin)
+                if (userRole === 'admin') {
+                    const resFinanzas = await fetch(`${API_URL}/reportes/finanzas`, { headers });
+                    if (resFinanzas.ok) {
+                        const dataFinanzas = await resFinanzas.json();
+                        document.getElementById('kpi-recaudado').innerText = `$${dataFinanzas.total_recaudado.toFixed(2)}`;
+                    }
+                } else {
+                    document.getElementById('kpi-recaudado').innerText = "N/A";
+                }
+
+            } catch (err) {
+                console.error("Error al cargar KPIs:", err);
+            }
+        }
+
+        // Cargar Lista corta de Deudores
+        async function cargarDeudores() {
+            const tabla = document.getElementById('tabla-deudores');
+            try {
+                const response = await fetch(`${API_URL}/atletas/morosos/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error("Error al obtener deudores");
+
+                const deudores = await response.json();
+
+                if (deudores.length === 0) {
+                    tabla.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="py-6 text-center text-emerald-400 font-semibold">
+                                <i class="fa-solid fa-circle-check mr-2"></i>¡Excelente! Todos los atletas están al día con sus pagos.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tabla.innerHTML = deudores.slice(0, 5).map(atleta => `
+                    <tr class="hover:bg-slate-800/40 transition-colors">
+                        <td class="py-3 px-4 font-bold text-white">${atleta.nombre} ${atleta.apellido}</td>
+                        <td class="py-3 px-4 text-slate-300">${atleta.categoria || 'S/C'}</td>
+                        <td class="py-3 px-4 text-slate-300">${atleta.nombre_representante || 'Sin registrar'}</td>
+                        <td class="py-3 px-4 text-slate-300">${atleta.telefono_representante || 'S/N'}</td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-950 text-red-400 border border-red-800">
+                                Deudor
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (err) {
+                tabla.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-4 text-center text-red-400">No se pudieron cargar los datos.</td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Descargar PDF de Reportes
+        async function descargarPDF() {
+            try {
+                const response = await fetch(`${API_URL}/reportes/solvencia/pdf`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) throw new Error("Error al generar PDF");
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Reporte_ArabitoFC.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            } catch (err) {
+                alert("No se pudo descargar el PDF. Revisa los permisos.");
+            }
+        }
+    </script>
+</body>
+</html>

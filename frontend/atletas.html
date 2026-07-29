@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arabito FC - Gestión de Atletas</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        arabito: {
+                            red: '#D32F2F',
+                            'red-hover': '#B71C1C',
+                            green: '#2E7D32',
+                            blue: '#0288D1',
+                            gold: '#FBC02D'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome para Íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="h-full bg-slate-950 text-slate-100 flex overflow-hidden selection:bg-arabito-red selection:text-white">
+
+    <!-- ==================== BARRA LATERAL (SIDEBAR) ==================== -->
+    <aside id="sidebar" class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between transition-all duration-300 z-30 shrink-0">
+        <div>
+            <!-- Header del Sidebar -->
+            <div class="p-6 border-b border-slate-800 flex flex-col items-center text-center">
+                <div class="w-20 h-24 bg-slate-950 p-2 rounded-xl border border-slate-800/80 shadow-md flex items-center justify-center shrink-0 mb-3 group transition-all hover:border-arabito-red/50">
+                    <img src="/frontend/assets/logo-arabito.png" alt="Logo Arabito FC" class="max-h-full max-w-full object-contain filter drop-shadow">
+                </div>
+                <div class="w-full">
+                    <h2 class="font-black text-white text-lg tracking-wider leading-none uppercase font-sans">ARABITO FC</h2>
+                    <span id="user-role-badge" class="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-arabito-red/20 text-arabito-red border border-arabito-red/30 uppercase mt-2">
+                        Cargando...
+                    </span>
+                </div>
+            </div>
+
+            <!-- Menú de Navegación -->
+            <nav class="p-4 space-y-1">
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 mb-2">Menú Principal</p>
+
+                <a href="dashboard.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all">
+                    <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="atletas.html" class="flex items-center gap-3 px-3 py-3 rounded-xl bg-arabito-red text-white font-semibold text-sm shadow-lg shadow-arabito-red/20 transition-all">
+                    <i class="fa-solid fa-users w-5 text-center"></i>
+                    <span>Atletas</span>
+                </a>
+
+                <a href="fichas-medicas.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all">
+                    <i class="fa-solid fa-notes-medical w-5 text-center"></i>
+                    <span>Fichas Médicas</span>
+                </a>
+
+                <a href="pagos.html" id="nav-pagos" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all">
+                    <i class="fa-solid fa-file-invoice-dollar w-5 text-center"></i>
+                    <span>Pagos y Caja</span>
+                </a>
+
+                <!-- Sección exclusiva Admin -->
+                <div id="section-admin-only" class="pt-4 border-t border-slate-800/60 mt-4">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 mb-2">Administración</p>
+                    
+                    <a href="usuarios.html" class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all">
+                        <i class="fa-solid fa-user-shield w-5 text-center"></i>
+                        <span>Gestión de Personal</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Footer del Sidebar -->
+        <div class="p-4 border-t border-slate-800">
+            <div class="flex items-center justify-between">
+                <div class="overflow-hidden pr-2">
+                    <p id="user-email" class="text-xs font-semibold text-slate-200 truncate">usuario@arabitofc.com</p>
+                    <p class="text-[10px] text-slate-500">Sesión Activa</p>
+                </div>
+                <button 
+                    onclick="logout()" 
+                    title="Cerrar Sesión" 
+                    class="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded-lg transition-all focus:outline-none"
+                >
+                    <i class="fa-solid fa-right-from-bracket text-base"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
+        
+        <!-- Header Superior -->
+        <header class="h-16 bg-slate-900/60 border-b border-slate-800 flex items-center justify-between px-6 shrink-0 backdrop-blur-md">
+            <div>
+                <h1 class="text-lg font-bold text-white">Gestión de Atletas</h1>
+                <p class="text-xs text-slate-400">Directorio, registro y control de alumnos de Arabito FC</p>
+            </div>
+            
+            <button 
+                onclick="abrirModalAtleta()" 
+                class="px-4 py-2 bg-arabito-red hover:bg-arabito-red-hover text-white font-bold text-xs rounded-xl shadow-lg shadow-arabito-red/20 transition-all flex items-center gap-2"
+            >
+                <i class="fa-solid fa-user-plus"></i>
+                <span>Nuevo Atleta</span>
+            </button>
+        </header>
+
+        <!-- Área Escroleable -->
+        <main class="flex-1 overflow-y-auto p-6 space-y-6">
+
+            <!-- Buscador y Filtros -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row gap-4 items-center justify-between">
+                <div class="relative w-full sm:w-80">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                    <input 
+                        type="text" 
+                        id="input-search-atleta" 
+                        oninput="filtrarAtletas()"
+                        placeholder="Buscar por cédula, nombre o representante..." 
+                        class="w-full pl-10 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-arabito-red transition-all"
+                    >
+                </div>
+
+                <div class="flex gap-3 w-full sm:w-auto">
+                    <!-- Filtro Categorías de Par en Par -->
+                    <select id="filter-categoria" onchange="filtrarAtletas()" class="bg-slate-950 border border-slate-800 text-slate-300 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-arabito-red">
+                        <option value="todas">Todas las Categorías</option>
+                        <option value="Sub-6">Sub-6</option>
+                        <option value="Sub-8">Sub-8</option>
+                        <option value="Sub-10">Sub-10</option>
+                        <option value="Sub-12">Sub-12</option>
+                        <option value="Sub-14">Sub-14</option>
+                        <option value="Sub-16">Sub-16</option>
+                        <option value="Sub-18">Sub-18</option>
+                        <option value="Libre">Libre</option>
+                    </select>
+
+                    <select id="filter-estatus" onchange="filtrarAtletas()" class="bg-slate-950 border border-slate-800 text-slate-300 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-arabito-red">
+                        <option value="todos">Todos los Estatus</option>
+                        <option value="solvente">Solventes</option>
+                        <option value="pendiente">Pendientes</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Tabla de Atletas -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase font-bold">
+                                <th class="py-3 px-4">Cédula</th>
+                                <th class="py-3 px-4">Atleta</th>
+                                <th class="py-3 px-4 text-center">Categoría</th>
+                                <th class="py-3 px-4">Representante</th>
+                                <th class="py-3 px-4 text-center">Estatus Pago</th>
+                                <th class="py-3 px-4 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-atletas" class="divide-y divide-slate-800/60 text-xs">
+                            <tr>
+                                <td colspan="6" class="py-6 text-center text-slate-500">Cargando atletas...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ==================== MODAL REGISTRAR / EDITAR ATLETA ==================== -->
+    <div id="modal-atleta" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
+            
+            <div class="flex justify-between items-center pb-4 border-b border-slate-800">
+                <h3 id="modal-atleta-title" class="text-base font-bold text-white uppercase tracking-wider">Nuevo Atleta</h3>
+                <button onclick="cerrarModalAtleta()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <form id="form-atleta" onsubmit="guardarAtleta(event)" class="mt-4 space-y-4">
+                <input type="hidden" id="atleta-id">
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cédula de Identidad (Opcional)</label>
+                    <input type="text" id="atleta-cedula" placeholder="Ej: V-32123456 (Dejar en blanco si no posee)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-arabito-red">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nombre</label>
+                        <input type="text" id="atleta-nombre" required placeholder="Ej: Carlos" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-arabito-red">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Apellido</label>
+                        <input type="text" id="atleta-apellido" required placeholder="Ej: Pérez" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-arabito-red">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Fecha de Nacimiento</label>
+                        <input 
+                            type="date" 
+                            id="atleta-fecha-nacimiento" 
+                            required 
+                            onchange="calcularCategoriaAuto()"
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-arabito-red"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Categoría (Auto)</label>
+                        <input 
+                            type="text" 
+                            id="atleta-categoria" 
+                            readonly 
+                            placeholder="Seleccione fecha..." 
+                            class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-emerald-400 font-bold focus:outline-none cursor-not-allowed"
+                        >
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nombre del Representante</label>
+                    <input type="text" id="atleta-representante" placeholder="Ej: María Pérez (Madre)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-arabito-red">
+                </div>
+
+                <div class="pt-4 border-t border-slate-800 flex justify-end gap-3">
+                    <button type="button" onclick="cerrarModalAtleta()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-arabito-red hover:bg-arabito-red-hover text-white font-bold text-xs rounded-xl shadow-lg shadow-arabito-red/20 transition-all">Guardar Atleta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script de Integración Backend -->
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+        const token = localStorage.getItem('access_token');
+        const userRole = localStorage.getItem('user_role');
+        const userEmail = localStorage.getItem('user_email');
+
+        let todosAtletas = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            document.getElementById('user-email').innerText = userEmail || 'Usuario';
+            document.getElementById('user-role-badge').innerText = userRole === 'admin' ? 'Administrador' : 'Entrenador';
+
+            if (userRole !== 'admin') {
+                const adminSection = document.getElementById('section-admin-only');
+                if (adminSection) adminSection.style.display = 'none';
+
+                const navPagos = document.getElementById('nav-pagos');
+                if (navPagos) navPagos.style.display = 'none';
+            }
+
+            cargarAtletas();
+        });
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        // FUNCIÓN DE CÁLCULO AUTOMÁTICO DE CATEGORÍAS (DE PAR EN PAR)
+        function calcularCategoriaAuto() {
+            const inputFecha = document.getElementById('atleta-fecha-nacimiento').value;
+            const inputCategoria = document.getElementById('atleta-categoria');
+
+            if (!inputFecha) {
+                inputCategoria.value = "";
+                return;
+            }
+
+            const hoy = new Date();
+            const nacimiento = new Date(inputFecha);
+            
+            let edad = hoy.getFullYear() - nacimiento.getFullYear();
+            const mes = hoy.getMonth() - nacimiento.getMonth();
+            
+            if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+                edad--;
+            }
+
+            let categoriaCalculada = "Libre";
+
+            if (edad <= 6) {
+                categoriaCalculada = "Sub-6";
+            } else if (edad <= 8) {
+                categoriaCalculada = "Sub-8";
+            } else if (edad <= 10) {
+                categoriaCalculada = "Sub-10";
+            } else if (edad <= 12) {
+                categoriaCalculada = "Sub-12";
+            } else if (edad <= 14) {
+                categoriaCalculada = "Sub-14";
+            } else if (edad <= 16) {
+                categoriaCalculada = "Sub-16";
+            } else if (edad <= 18) {
+                categoriaCalculada = "Sub-18";
+            }
+
+            inputCategoria.value = categoriaCalculada;
+        }
+
+        async function cargarAtletas() {
+            try {
+                const res = await fetch(`${API_URL}/atletas/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!res.ok) throw new Error("Error al consultar lista de atletas");
+
+                todosAtletas = await res.json();
+                filtrarAtletas();
+
+            } catch (err) {
+                document.getElementById('tabla-atletas').innerHTML = `
+                    <tr><td colspan="6" class="py-4 text-center text-red-400">Error al conectar con el servidor.</td></tr>
+                `;
+            }
+        }
+
+        function filtrarAtletas() {
+            const search = document.getElementById('input-search-atleta').value.toLowerCase();
+            const catFilter = document.getElementById('filter-categoria').value;
+            const estFilter = document.getElementById('filter-estatus').value;
+
+            const filtrados = todosAtletas.filter(a => {
+                const cedula = a.cedula ? a.cedula.toLowerCase() : '';
+                const nombreCompleto = `${a.nombre} ${a.apellido}`.toLowerCase();
+                const rep = a.representante ? a.representante.toLowerCase() : '';
+
+                const coincideSearch = cedula.includes(search) || nombreCompleto.includes(search) || rep.includes(search);
+                const coincideCat = catFilter === 'todas' || a.categoria === catFilter;
+                const coincideEst = estFilter === 'todos' || 
+                    (estFilter === 'solvente' && a.estatus_pago === 'solvente') || 
+                    (estFilter === 'pendiente' && a.estatus_pago !== 'solvente');
+
+                return coincideSearch && coincideCat && coincideEst;
+            });
+
+            const tabla = document.getElementById('tabla-atletas');
+
+            if (filtrados.length === 0) {
+                tabla.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500">No se encontraron atletas.</td></tr>`;
+                return;
+            }
+
+            tabla.innerHTML = filtrados.map(a => `
+                <tr class="hover:bg-slate-800/40 transition-colors">
+                    <td class="py-3 px-4 font-mono text-slate-400">${a.cedula || '<span class="text-slate-600">S/C</span>'}</td>
+                    <td class="py-3 px-4 font-bold text-white">${a.nombre} ${a.apellido}</td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 font-mono text-[10px] font-bold text-slate-300">${a.categoria || 'S/C'}</span>
+                    </td>
+                    <td class="py-3 px-4 text-slate-300">${a.representante || 'Sin registrar'}</td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${a.estatus_pago === 'solvente' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-rose-950 text-rose-400 border border-rose-800'}">
+                            ${a.estatus_pago === 'solvente' ? 'Solvente' : 'Pendiente'}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        <button onclick='editarAtleta(${JSON.stringify(a)})' title="Editar Atleta" class="p-1.5 text-slate-400 hover:text-arabito-blue rounded transition-all">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function abrirModalAtleta() {
+            document.getElementById('form-atleta').reset();
+            document.getElementById('atleta-id').value = '';
+            document.getElementById('atleta-cedula').value = '';
+            document.getElementById('atleta-categoria').value = '';
+            document.getElementById('modal-atleta-title').innerText = "Nuevo Atleta";
+            document.getElementById('modal-atleta').classList.remove('hidden');
+        }
+
+        function editarAtleta(a) {
+            document.getElementById('atleta-id').value = a.id;
+            document.getElementById('atleta-cedula').value = a.cedula || '';
+            document.getElementById('atleta-nombre').value = a.nombre;
+            document.getElementById('atleta-apellido').value = a.apellido;
+            document.getElementById('atleta-fecha-nacimiento').value = a.fecha_nacimiento || '';
+            document.getElementById('atleta-representante').value = a.representante || '';
+            
+            if (a.fecha_nacimiento) {
+                calcularCategoriaAuto();
+            } else {
+                document.getElementById('atleta-categoria').value = a.categoria || '';
+            }
+
+            document.getElementById('modal-atleta-title').innerText = "Editar Atleta";
+            document.getElementById('modal-atleta').classList.remove('hidden');
+        }
+
+        function cerrarModalAtleta() {
+            document.getElementById('modal-atleta').classList.add('hidden');
+        }
+
+        async function guardarAtleta(e) {
+            e.preventDefault();
+            const id = document.getElementById('atleta-id').value;
+
+            const payload = {
+                cedula: document.getElementById('atleta-cedula').value || null,
+                nombre: document.getElementById('atleta-nombre').value,
+                apellido: document.getElementById('atleta-apellido').value,
+                fecha_nacimiento: document.getElementById('atleta-fecha-nacimiento').value,
+                categoria: document.getElementById('atleta-categoria').value,
+                representante: document.getElementById('atleta-representante').value || null
+            };
+
+            const url = id ? `${API_URL}/atletas/${id}` : `${API_URL}/atletas/`;
+            const method = id ? 'PUT' : 'POST';
+
+            try {
+                const res = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) throw new Error("Error al guardar atleta");
+
+                cerrarModalAtleta();
+                cargarAtletas();
+            } catch (err) {
+                alert("Ocurrió un error al guardar los datos del atleta.");
+            }
+        }
+    </script>
+</body>
+</html>
